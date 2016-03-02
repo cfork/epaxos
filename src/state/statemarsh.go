@@ -44,24 +44,8 @@ func (t *Command) Marshal(wire io.Writer) {
 	var bs []byte
 	bs = b[:17]
 	bs[0] = byte(t.Op)
-	tmp64 := int64(t.K)
-	bs[1] = byte(tmp64)
-	bs[2] = byte(tmp64 >> 8)
-	bs[3] = byte(tmp64 >> 16)
-	bs[4] = byte(tmp64 >> 24)
-	bs[5] = byte(tmp64 >> 32)
-	bs[6] = byte(tmp64 >> 40)
-	bs[7] = byte(tmp64 >> 48)
-	bs[8] = byte(tmp64 >> 56)
-	tmp64 = int64(t.V)
-	bs[9] = byte(tmp64)
-	bs[10] = byte(tmp64 >> 8)
-	bs[11] = byte(tmp64 >> 16)
-	bs[12] = byte(tmp64 >> 24)
-	bs[13] = byte(tmp64 >> 32)
-	bs[14] = byte(tmp64 >> 40)
-	bs[15] = byte(tmp64 >> 48)
-	bs[16] = byte(tmp64 >> 56)
+	binary.LittleEndian.PutUint64(bs[1:9], uint64(t.K))
+	binary.LittleEndian.PutUint64(bs[9:17], uint64(t.V))
 	wire.Write(bs)
 }
 
@@ -73,8 +57,8 @@ func (t *Command) Unmarshal(wire io.Reader) error {
 		return err
 	}
 	t.Op = Operation(bs[0])
-	t.K = Key((uint64(bs[1]) | (uint64(bs[2]) << 8) | (uint64(bs[3]) << 16) | (uint64(bs[4]) << 24) | (uint64(bs[5]) << 32) | (uint64(bs[6]) << 40) | (uint64(bs[7]) << 48) | (uint64(bs[8]) << 56)))
-	t.V = Value((uint64(bs[9]) | (uint64(bs[10]) << 8) | (uint64(bs[11]) << 16) | (uint64(bs[12]) << 24) | (uint64(bs[13]) << 32) | (uint64(bs[14]) << 40) | (uint64(bs[15]) << 48) | (uint64(bs[16]) << 56)))
+	t.K = Key(binary.LittleEndian.Uint64(bs[1:9]))
+	t.V = Value(binary.LittleEndian.Uint64(bs[9:17]))
 	return nil
 }
 
