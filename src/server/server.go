@@ -14,7 +14,6 @@ import (
 	"os"
 	"os/signal"
 	"paxos"
-	"runtime"
 	"runtime/pprof"
 	"time"
 )
@@ -26,7 +25,6 @@ var myAddr *string = flag.String("addr", "", "Server address (this machine). Def
 var doMencius *bool = flag.Bool("m", false, "Use Mencius as the replication protocol. Defaults to false.")
 var doGpaxos *bool = flag.Bool("g", false, "Use Generalized Paxos as the replication protocol. Defaults to false.")
 var doEpaxos *bool = flag.Bool("e", false, "Use EPaxos as the replication protocol. Defaults to false.")
-var procs *int = flag.Int("p", 2, "GOMAXPROCS. Defaults to 2")
 var cpuprofile = flag.String("cpuprofile", "", "write cpu profile to file")
 var thrifty = flag.Bool("thrifty", false, "Use only as many messages as strictly required for inter-replica communication.")
 var exec = flag.Bool("exec", false, "Execute commands.")
@@ -36,8 +34,6 @@ var durable = flag.Bool("durable", false, "Log to a stable store (i.e., a file i
 
 func main() {
 	flag.Parse()
-
-	runtime.GOMAXPROCS(*procs)
 
 	if *cpuprofile != "" {
 		f, err := os.Create(*cpuprofile)
